@@ -1,5 +1,5 @@
 <?php
-
+//app\Models\User.php
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -47,4 +47,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-}
+
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+}   
