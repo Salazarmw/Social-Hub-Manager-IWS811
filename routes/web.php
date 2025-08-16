@@ -6,6 +6,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\OAuthController;
 use App\Http\Controllers\TwoFactorController;
+use App\Http\Controllers\Auth\TwoFactorVerifyController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -38,6 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('enable', 'enable')->name('2fa.enable');
         Route::post('disable', 'disable')->name('2fa.disable');
     });
+
+    // 2FA verification after login
+    Route::get('/2fa/verify', [TwoFactorVerifyController::class, 'show'])->name('2fa.verify');
+    Route::post('/2fa/verify', [TwoFactorVerifyController::class, 'verify']);
 });
 
 require __DIR__ . '/auth.php';

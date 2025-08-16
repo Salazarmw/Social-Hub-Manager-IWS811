@@ -28,6 +28,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        // Si el usuario tiene 2FA activo, limpiar flag y redirigir a verificación 2FA
+        if ($user && $user->two_factor_enabled) {
+            $request->session()->forget('2fa_passed');
+            return redirect()->route('2fa.verify');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
