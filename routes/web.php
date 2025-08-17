@@ -8,7 +8,6 @@ use App\Http\Controllers\OAuthController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\Auth\TwoFactorVerifyController;
 
-
 Route::get('/', function () {
     return view('welcome');
 });
