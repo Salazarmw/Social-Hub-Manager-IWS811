@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use PragmaRX\Google2FA\Google2FA;
 
 class TwoFactorController extends Controller
 {
@@ -13,7 +14,8 @@ class TwoFactorController extends Controller
     public function enable(Request $r)
     {
         $secret = decrypt(session('2fa_secret'));
-        if (Google2FA::verifyKey($secret, $r->code)) {
+        $g2fa = new Google2FA();
+        if ($g2fa->verifyKey($secret, $r->code)) {
             auth()->user()->update(['two_factor_secret' => encrypt($secret), 'two_factor_enabled' => true]);
             return redirect()->route('settings')->with('status', '2FA activado');
         }

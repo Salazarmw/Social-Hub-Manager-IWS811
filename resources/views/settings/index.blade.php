@@ -22,29 +22,32 @@
             </section>
 
             <!-- 2FA -->
-            <section>
+            <section x-data="{ showModal: false }">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Seguridad – Autenticación en dos pasos</h3>
                 <div class="bg-white border border-gray-100 rounded-xl p-6">
-                    <form method="POST" action="{{ $twoFactorEnabled ? route('2fa.disable') : route('2fa.enable') }}">
-                        @csrf
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-700">Activar 2FA</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" class="sr-only peer"
-                                    @if ($twoFactorEnabled) checked @endif onchange="this.form.submit()">
-                                <div
-                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600">
-                                </div>
-                            </label>
-                        </div>
-                        @if (!$twoFactorEnabled && $qrCode)
-                            <div class="mt-4">
-                                <p class="text-sm text-gray-600 mb-2">Escanea el siguiente código con tu app de
-                                    autenticación:</p>
-                                <div class="inline-block border p-2 bg-white">{!! $qrCode !!}</div>
+                    @if ($twoFactorEnabled)
+                        <form method="POST" action="{{ route('2fa.disable') }}">
+                            @csrf
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-700">2FA está <span class="text-green-600 font-bold">activo</span></span>
+                                <button type="submit" class="ml-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Desactivar 2FA</button>
                             </div>
-                        @endif
-                    </form>
+                        </form>
+                    @else
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-700">2FA está <span class="text-gray-500 font-bold">inactivo</span></span>
+                            <button @click="showModal = true" type="button" class="ml-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Activar 2FA</button>
+                        </div>
+                        <!-- Modal QR -->
+                        <template x-if="showModal">
+                            <x-modal>
+                                <h4 class="text-lg font-semibold mb-4">Activar 2FA</h4>
+                                <p class="text-sm text-gray-600 mb-2">Escanea el siguiente código con tu app de autenticación:</p>
+                                <div class="border p-2 bg-white mb-4 flex justify-center">{!! $qrCode !!}</div>
+                                <x-two-factor-form />
+                            </x-modal>
+                        </template>
+                    @endif
                 </div>
             </section>
 

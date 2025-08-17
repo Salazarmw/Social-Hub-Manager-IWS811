@@ -11,6 +11,10 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        $user = auth()->user();
+        if ($user && $user->two_factor_enabled && !session('2fa_passed')) {
+            return redirect()->route('2fa.verify');
+        }
         return view('dashboard');
     }
 }
