@@ -8,6 +8,7 @@ use App\Http\Controllers\OAuthController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\Auth\TwoFactorVerifyController;
 
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -22,6 +23,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
+// OAuth entry points
+Route::prefix('oauth')->group(function () {
+    Route::get('{provider}/redirect', [OAuthController::class, 'redirect'])->name('oauth.redirect');
+    Route::get('{provider}/callback', [OAuthController::class, 'callback'])->name('oauth.callback');
+    Route::delete('{provider}/revoke', [OAuthController::class, 'revoke'])->middleware(['auth', 'verified'])->name('oauth.revoke');
+});
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // Posts routes
     Route::post('/posts', [\App\Http\Controllers\PostController::class, 'store'])->name('posts.store');
@@ -32,13 +41,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::get('/settings', [SettingsController::class, 'index'])
         ->name('settings');
-
-    // OAuth entry points
-    Route::prefix('oauth')->group(function () {
-        Route::get('{provider}/redirect', [OAuthController::class, 'redirect'])->name('oauth.redirect');
-        Route::get('{provider}/callback', [OAuthController::class, 'callback'])->name('oauth.callback');
-        Route::delete('{provider}/revoke', [OAuthController::class, 'revoke'])->name('oauth.revoke');
-    });
 
     // 2FA
     Route::prefix('2fa')->controller(TwoFactorController::class)->group(function () {

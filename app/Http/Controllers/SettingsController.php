@@ -13,25 +13,34 @@ class SettingsController extends Controller
 {
     public function index()
     {
-        $user   = auth()->user();
-        $g2fa   = new Google2FA();
-        $secret = $g2fa->generateSecretKey();
-        session(['2fa_secret' => encrypt($secret)]);
+        $user = auth()->user();
+        $socialAccounts = $user->socialAccounts()->get();
+        $accounts = $socialAccounts->keyBy('provider');
 
-        $qrUrl = $g2fa->getQRCodeUrl(config('app.name'), $user->email, $secret);
+        // 2FA Logic - solo generar QR si no está habilitado
+        $twoFactorEnabled = $user->two_factor_enabled;
+        $qrCode = null;
 
-        $renderer = new ImageRenderer(
-            new RendererStyle(192), // tamaño del QR (192 px)
-            new SvgImageBackEnd()
-        );
+        if (!$twoFactorEnabled) {
+            $g2fa = new Google2FA();
+            $secret = $g2fa->generateSecretKey();
+            session(['2fa_secret' => encrypt($secret)]);
 
-        $writer = new Writer($renderer);
-        $qrSvg  = $writer->writeString($qrUrl);
+            $qrUrl = $g2fa->getQRCodeUrl(config('app.name'), $user->email, $secret);
+
+            $renderer = new ImageRenderer(
+                new RendererStyle(192),
+                new SvgImageBackEnd()
+            );
+
+            $writer = new Writer($renderer);
+            $qrCode = $writer->writeString($qrUrl);
+        }
 
         return view('settings.index', [
-            'accounts'         => $user->socialAccounts()->get()->groupBy('provider'),
-            'twoFactorEnabled' => $user->two_factor_enabled,
-            'qrCode'           => $user->two_factor_enabled ? null : $qrSvg,
+            'accounts' => $accounts,
+            'twoFactorEnabled' => $twoFactorEnabled,
+            'qrCode' => $qrCode,
         ]);
     }
 }

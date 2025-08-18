@@ -5,22 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SocialAccount extends Model
+class ManagedPage extends Model
 {
     protected $fillable = [
         'user_id',
         'provider',
-        'provider_user_id',
-        'token',
-        'token_secret',
-        'refresh_token',
-        'expires_in',
-        'nickname',
-        'avatar'
+        'page_id',
+        'name',
+        'access_token',
+        'category',
+        'picture_url'
     ];
 
     protected $casts = [
-        'expires_in' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
