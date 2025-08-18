@@ -5,7 +5,7 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
+            {{ __('Update your account\'s profile information and email address.') }}
         </p>
     </header>
 
@@ -13,7 +13,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" id="profile-form">
         @csrf
         @method('patch')
 
@@ -48,7 +48,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button type="submit">{{ __('Save') }}</x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -62,3 +62,18 @@
         </div>
     </form>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileForm = document.getElementById('profile-form');
+        if (profileForm) {
+            profileForm.addEventListener('submit', function(e) {
+                // Prevent default only if you want to handle the submission via AJAX
+                // e.preventDefault();
+                
+                // Submit the form normally
+                return true;
+            });
+        }
+    });
+</script>

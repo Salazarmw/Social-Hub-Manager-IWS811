@@ -23,6 +23,13 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Posts routes
+    Route::post('/posts', [\App\Http\Controllers\PostController::class, 'store'])->name('posts.store');
+    
+    // Queue routes
+    Route::get('/queue', [\App\Http\Controllers\QueueController::class, 'index'])->name('queue.index');
+    Route::delete('/queue/{id}', [\App\Http\Controllers\QueueController::class, 'destroy'])->name('queue.destroy');
+    
     Route::get('/settings', [SettingsController::class, 'index'])
         ->name('settings');
 
