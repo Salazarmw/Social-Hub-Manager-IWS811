@@ -47,14 +47,4 @@
     </form>
 </section>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const passwordForm = document.getElementById('password-form');
-        if (passwordForm) {
-            passwordForm.addEventListener('submit', function(e) {
-                // Submit the form normally
-                return true;
-            });
-        }
-    });
-</script>
+

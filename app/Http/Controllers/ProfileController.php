@@ -17,6 +17,14 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        // Limpiar cualquier error de userDeletion y el flag de sesión para evitar que el modal se muestre automáticamente
+        if (session()->has('errors') && session('errors')->hasBag('userDeletion')) {
+            session()->get('errors')->getBag('userDeletion')->clear();
+        }
+        if (session()->has('showDeleteModal')) {
+            session()->forget('showDeleteModal');
+        }
+
         return view('profile.edit', [
             'user' => $request->user(),
         ]);
@@ -47,9 +55,14 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
+        try {
+            $request->validateWithBag('userDeletion', [
+                'password' => ['required', 'current_password'],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Redirigir con flag para mostrar el modal si hay error de validación
+            return Redirect::route('profile.edit')->withErrors($e->errors(), 'userDeletion')->with('showDeleteModal', true);
+        }
 
         $user = $request->user();
 

@@ -63,17 +63,4 @@
     </form>
 </section>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const profileForm = document.getElementById('profile-form');
-        if (profileForm) {
-            profileForm.addEventListener('submit', function(e) {
-                // Prevent default only if you want to handle the submission via AJAX
-                // e.preventDefault();
-                
-                // Submit the form normally
-                return true;
-            });
-        }
-    });
-</script>
+
