@@ -54,4 +54,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(SocialAccount::class);
     }
-}   
+
+    public function managedPages()
+    {
+        return $this->hasMany(ManagedPage::class);
+    }
+}
