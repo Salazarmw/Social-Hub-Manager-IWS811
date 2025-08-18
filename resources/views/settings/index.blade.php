@@ -25,7 +25,6 @@
 
                     @foreach ($availableProviders as $providerKey => $providerName)
                         @php
-                            // Si usas groupBy, necesitas obtener el primer elemento
                             $account = null;
                             if ($accounts->has($providerKey)) {
                                 $providerAccounts = $accounts->get($providerKey);
@@ -65,7 +64,6 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             @foreach ($accounts as $provider => $accountData)
                                 @php
-                                    // Manejar tanto keyBy como groupBy
                                     $account = is_a($accountData, 'Illuminate\Database\Eloquent\Collection')
                                         ? $accountData->first()
                                         : $accountData;
