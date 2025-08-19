@@ -1,0 +1,1 @@
+// Este archivo está vacío porque los formularios ahora usan el submit tradicional de Laravel.

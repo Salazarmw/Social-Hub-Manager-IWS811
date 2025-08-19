@@ -135,3 +135,14 @@ php artisan migrate:fresh --seed
 - Conectar los enlaces de la navbar (Publicaciones, Cola, Horarios, Configuración) a rutas reales.
 - Implementar 2FA.
 - Implementar las diferentes redes y hacer que el proyecto sirva en general xD
+
+
+## 12) Para ejecutar los schedules
+
+Para que las publicaciones programadas funcionen correctamente, necesitas ejecutar dos comandos: 
+- php artisan app:process-scheduled-posts
+- php artisan queue:work
+
+Estos comandos deben ejecutarse en terminales separadas. El primero procesa las publicaciones programadas, y el segundo procesa la cola de publicaciones.
+
+Hay que buscar una forma de que estén siempre ejecutandose cuando se aloje en un servidor
