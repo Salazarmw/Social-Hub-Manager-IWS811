@@ -59,4 +59,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(ManagedPage::class);
     }
+
+    /**
+     * Obtener las publicaciones programadas del usuario.
+     */
+    public function scheduledPosts()
+    {
+        return $this->hasMany(ScheduledPost::class);
+    }
+
+
+
 }
+    
+    
