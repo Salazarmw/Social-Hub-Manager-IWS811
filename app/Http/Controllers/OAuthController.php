@@ -105,8 +105,8 @@ class OAuthController extends Controller
     private function redirectX()
     {
         $connection = new \Abraham\TwitterOAuth\TwitterOAuth(
-            env('X_API_KEY'),
-            env('X_API_KEY_SECRET')
+            config('services.x.key'),
+            config('services.x.secret')
         );
 
         $request_token = $connection->oauth('oauth/request_token', [
@@ -133,8 +133,8 @@ class OAuthController extends Controller
         $request_token_secret = session('x_oauth_token_secret');
 
         $connection = new \Abraham\TwitterOAuth\TwitterOAuth(
-            env('X_API_KEY'),
-            env('X_API_KEY_SECRET'),
+            config('services.x.key'),
+            config('services.x.secret'),
             $request_token,
             $request_token_secret
         );
@@ -144,9 +144,12 @@ class OAuthController extends Controller
         ]);
 
         auth()->user()->socialAccounts()->updateOrCreate(
-            ['provider' => 'x'],
             [
-                'provider_user_id' => $access_token['user_id'],
+                'provider' => 'x',
+                'user_id' => auth()->id()
+            ],
+            [
+                'provider_user_id' => (string)$access_token['user_id'],
                 'token' => encrypt($access_token['oauth_token']),
                 'token_secret' => encrypt($access_token['oauth_token_secret']),
                 'nickname' => $access_token['screen_name'],

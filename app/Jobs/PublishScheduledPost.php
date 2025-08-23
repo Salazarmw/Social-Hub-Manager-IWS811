@@ -44,14 +44,28 @@ class PublishScheduledPost implements ShouldQueue
                 try {
                     switch ($platform) {
                         case 'twitter':
-                            $twitterService->publish($this->post->content);
+                            // Obtener la cuenta social de Twitter del usuario
+                            $twitterAccount = $this->post->user->socialAccounts()
+                                ->where('provider', 'x')
+                                ->first();
+                            
+                            if (!$twitterAccount) {
+                                throw new \Exception('No se encontró una cuenta de Twitter vinculada.');
+                            }
+                            
+                            if (!$twitterService->publish($this->post->content, $twitterAccount)) {
+                                throw new \Exception('Error al publicar en Twitter.');
+                            }
                             break;
+                            
                         case 'facebook':
                             $facebookService->publish($this->post->content);
                             break;
+                            
                         case 'instagram':
                             $instagramService->publish($this->post->content);
                             break;
+                            
                         default:
                             Log::warning("Plataforma desconocida: {$platform}");
                             $publishedSuccessfully = false;
