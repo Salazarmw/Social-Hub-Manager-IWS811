@@ -225,12 +225,12 @@ class OAuthController extends Controller
         session(['reddit_state' => $state]);
 
         $params = [
-            'client_id' => env('REDDIT_CLIENT_ID'),
+            'client_id' => config('services.reddit.client_id'),
             'response_type' => 'code',
             'state' => $state,
-            'redirect_uri' => route('oauth.callback', 'reddit'),
+            'redirect_uri' => config('services.reddit.redirect_uri'),
             'duration' => 'permanent',
-            'scope' => 'identity submit'
+            'scope' => 'identity edit submit read'
         ];
 
         $url = 'https://www.reddit.com/api/v1/authorize?' . http_build_query($params);
@@ -247,13 +247,13 @@ class OAuthController extends Controller
         }
 
         // Intercambiar código por token
-        $response = Http::withBasicAuth(env('REDDIT_CLIENT_ID'), env('REDDIT_CLIENT_SECRET'))
+        $response = Http::withBasicAuth(config('services.reddit.client_id'), config('services.reddit.client_secret'))
             ->asForm()
-            ->withHeaders(['User-Agent' => env('APP_NAME') . '/1.0'])
+            ->withHeaders(['User-Agent' => config('services.reddit.user_agent')])
             ->post('https://www.reddit.com/api/v1/access_token', [
                 'grant_type' => 'authorization_code',
                 'code' => $code,
-                'redirect_uri' => route('oauth.callback', 'reddit'),
+                'redirect_uri' => config('services.reddit.redirect_uri'),
             ]);
 
         if (!$response->successful()) {

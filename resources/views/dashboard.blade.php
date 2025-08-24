@@ -18,32 +18,19 @@
                         <x-textarea name="content" placeholder="Escribe tu publicación..." />
                     </div>
                     
-                    <!-- Selección de plataformas -->
-                    <div class="mt-4">
-                        <h4 class="text-sm font-medium text-gray-700 mb-2">Publicar en:</h4>
-                        <div class="flex flex-wrap gap-2">
-                            <label class="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm cursor-pointer hover:bg-blue-100">
-                                <input type="checkbox" name="platforms[]" value="twitter" class="mr-1.5 h-4 w-4 text-blue-600 rounded">
-                                Twitter
-                            </label>
-                            <label class="inline-flex items-center px-3 py-1.5 rounded-full bg-pink-50 text-pink-700 text-sm cursor-pointer hover:bg-pink-100">
-                                <input type="checkbox" name="platforms[]" value="instagram" class="mr-1.5 h-4 w-4 text-pink-600 rounded">
-                                Instagram
-                            </label>
-                            <label class="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 text-blue-800 text-sm cursor-pointer hover:bg-blue-100">
-                                <input type="checkbox" name="platforms[]" value="facebook" class="mr-1.5 h-4 w-4 text-blue-600 rounded">
-                                Facebook
-                            </label>
-                        </div>
+                    <!-- Input ocultos para plataformas -->
+                    <div class="hidden">
+                        <input type="checkbox" name="platforms[]" value="twitter">
+                        <input type="checkbox" name="platforms[]" value="reddit">
                     </div>
 
                     <x-actions>
                         <x-slot:left>
-                            <x-button-icon text="Medios">
+                            <x-button-icon type="button" data-media-button text="Plataformas">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                     stroke="currentColor" class="w-4 h-4">
                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356 10.49A2.25 2.25 0 0019.5 19.5V10.125a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25V19.5a2.25 2.25 0 002.25 2.25h8.25" />
+                                        d="M6 13.5V3.75m0 9.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 9.75V10.5" />
                                 </svg>
                             </x-button-icon>
 
@@ -74,20 +61,25 @@
             <!-- Tarjetas de estadísticas -->
             <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <x-stat-card title="Publicaciones programadas">
-                    <div class="text-2xl font-semibold text-gray-800">12</div>
+                    <div class="text-2xl font-semibold text-gray-800">{{ $stats['scheduled'] }}</div>
                 </x-stat-card>
 
                 <x-stat-card title="En cola">
-                    <div class="text-2xl font-semibold text-gray-800">5</div>
+                    <div class="text-2xl font-semibold text-gray-800">{{ $stats['queued'] }}</div>
                 </x-stat-card>
 
                 <x-stat-card title="Cuentas conectadas">
-                    <div class="text-2xl font-semibold text-gray-800">3</div>
+                    <div class="text-2xl font-semibold text-gray-800">{{ $stats['accounts'] }}</div>
                 </x-stat-card>
             </div>
         </div>
     </div>
+
+    <!-- Modal de selección de plataformas -->
+    <x-platform-selector-modal />
+
     @push('scripts')
         <script src="{{ asset('js/calendar.js') }}"></script>
+        <script src="{{ asset('js/platform-selector.js') }}"></script>
     @endpush
 </x-app-layout>

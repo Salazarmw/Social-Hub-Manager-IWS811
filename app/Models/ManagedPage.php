@@ -13,13 +13,25 @@ class ManagedPage extends Model
         'page_id',
         'name',
         'access_token',
+        'token_secret',
+        'refresh_token',
+        'token_expires_at',
         'category',
-        'picture_url'
+        'picture_url',
+        'metadata'
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'token_expires_at' => 'datetime',
+        'metadata' => 'array'
+    ];
+
+    protected $hidden = [
+        'access_token',
+        'token_secret',
+        'refresh_token'
     ];
 
     public function user(): BelongsTo

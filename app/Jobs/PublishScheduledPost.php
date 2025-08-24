@@ -10,8 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Services\TwitterService;
-use App\Services\FacebookService;
-use App\Services\InstagramService;
+use App\Services\RedditService;
 
 class PublishScheduledPost implements ShouldQueue
 {
@@ -30,8 +29,7 @@ class PublishScheduledPost implements ShouldQueue
      */
     public function handle(
         TwitterService $twitterService,
-        FacebookService $facebookService,
-        InstagramService $instagramService
+        RedditService $redditService
     ): void
     {
         try {
@@ -58,12 +56,19 @@ class PublishScheduledPost implements ShouldQueue
                             }
                             break;
                             
-                        case 'facebook':
-                            $facebookService->publish($this->post->content);
-                            break;
+                        case 'reddit':
+                            // Obtener la cuenta social de Reddit del usuario
+                            $redditAccount = $this->post->user->socialAccounts()
+                                ->where('provider', 'reddit')
+                                ->first();
                             
-                        case 'instagram':
-                            $instagramService->publish($this->post->content);
+                            if (!$redditAccount) {
+                                throw new \Exception('No se encontró una cuenta de Reddit vinculada.');
+                            }
+                            
+                            if (!$redditService->publish($this->post->content, $redditAccount)) {
+                                throw new \Exception('Error al publicar en Reddit.');
+                            }
                             break;
                             
                         default:

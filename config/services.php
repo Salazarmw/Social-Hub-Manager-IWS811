@@ -70,7 +70,7 @@ return [
         'client_id' => env('REDDIT_CLIENT_ID'),
         'client_secret' => env('REDDIT_CLIENT_SECRET'),
         'redirect_uri' => env('REDDIT_REDIRECT_URI', env('APP_URL') . '/oauth/reddit/callback'),
-        'user_agent' => env('REDDIT_USER_AGENT', env('APP_NAME') . '/1.0'),
+        'user_agent' => env('REDDIT_USER_AGENT', 'web:social-hub-manager:v1.0 (by /u/your_reddit_username)'),
     ],
 
     // Telegram Bot Widget - Manual implementation

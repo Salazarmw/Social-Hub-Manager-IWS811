@@ -33,7 +33,7 @@ class PostController extends Controller
         $request->validate([
             'content' => 'required|string|max:280',
             'platforms' => 'required|array',
-            'platforms.*' => 'string|in:twitter,facebook,instagram',
+            'platforms.*' => 'string|in:twitter,reddit',
             'scheduled_date' => 'nullable|date_format:Y-m-d H:i:s',
         ]);
 

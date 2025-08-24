@@ -6,7 +6,7 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 use App\Models\SocialAccount;
 use Illuminate\Support\Facades\Log;
 
-class TwitterService
+class TwitterService implements SocialServiceInterface
 {
     protected $connection;
 
@@ -27,7 +27,7 @@ class TwitterService
                 decrypt($account->token_secret)
             );
 
-            // Activar el modo JSON para la API v2
+            // Configurar para la API v2
             $this->connection->setApiVersion('2');
 
             // Intentar publicar el tweet usando la API v2
