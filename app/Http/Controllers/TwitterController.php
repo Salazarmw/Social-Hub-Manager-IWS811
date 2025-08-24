@@ -14,10 +14,10 @@ class TwitterController extends Controller
 
     public function __construct()
     {
-        $this->apiKey = env('X_API_KEY');
-        $this->apiSecret = env('X_API_KEY_SECRET');
-        $this->token = env('X_TOKEN');
-        $this->tokenSecret = env('X_TOKEN_SECRET');
+        $this->apiKey = config('services.x.key');
+        $this->apiSecret = config('services.x.secret');
+        $this->token = config('services.x.token');
+        $this->tokenSecret = config('services.x.token_secret');
     }
 
     public function postTweet($text)

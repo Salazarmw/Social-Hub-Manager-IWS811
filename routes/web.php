@@ -55,3 +55,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+// Ruta temporal para debug de variables de entorno
+Route::get('/debug/env', function () {
+    return response()->json([
+        'X_API_KEY' => env('X_API_KEY'),
+        'X_API_KEY_SECRET' => env('X_API_KEY_SECRET'),
+        'APP_KEY' => env('APP_KEY'),
+    ]);
+});
