@@ -4,13 +4,18 @@ Este proyecto es un gestor de redes sociales que permite programar y publicar co
 
 ## Características implementadas
 
-- ✅ Autenticación de usuarios
-- ✅ Integración con Twitter (X)
-- ✅ Integración con Reddit
+- ✅ Autenticación de usuarios con protección de rutas
+- ✅ Integración con Twitter (X) - Publicaciones automáticas
+- ✅ Integración con Reddit - Publicaciones automáticas  
 - ✅ Programación de publicaciones
-- ✅ Cola de publicaciones
-- ✅ Sistema de procesamiento en segundo plano
-- ✅ Interfaz moderna con Tailwind CSS
+- ✅ Cola de publicaciones con procesamiento en segundo plano
+- ✅ Sistema de procesamiento automático con cron jobs
+- ✅ **Calendario de horarios interactivo** con vista mensual, semanal y diaria
+- ✅ **Horarios recurrentes** (ej: Lunes y Miércoles a las 9 AM)
+- ✅ **Horarios específicos** (fecha y hora exacta)
+- ✅ **Autenticación de dos factores (2FA)** para acciones sensibles
+- ✅ Interfaz moderna con Tailwind CSS y componentes interactivos
+- ✅ Sistema de notificaciones y mensajes de éxito/error
 
 ## Requisitos previos
 - PHP 8.2+
@@ -106,25 +111,70 @@ php artisan serve
 ```
 Si usaste dominio personalizado, accede a `http://social-hub-manager-iws811.test` (según tu `APP_URL`). (O simplemente usa laravel herd)
 
-## 8) Estructura relevante
-- Rutas web: `routes/web.php`
-- Controlador dashboard: `app/Http/Controllers/DashboardController.php`
-- Vistas auth personalizadas: `resources/views/auth/`
-- Layouts y navegación: `resources/views/layouts/`
-- Dashboard: `resources/views/dashboard.blade.php`
-- Assets (Vite): `resources/css/app.css`, `resources/js/app.js`
+### 🌐 URLs principales de la aplicación:
+- **Dashboard:** `/dashboard` - Panel principal con resumen
+- **Calendario:** `/calendar` - Gestión de horarios de publicación
+- **Cola:** `/queue` - Monitoreo de publicaciones programadas  
+- **Configuración:** `/settings` - Conexión de cuentas sociales y 2FA
+- **Perfil:** `/profile` - Gestión de perfil de usuario
 
-## 9) Comandos útiles
-- Limpiar cachés:
+## 8) Estructura relevante
+- **Rutas principales:**
+  - `routes/web.php` - Todas las rutas web y API
+  - `routes/auth.php` - Rutas de autenticación
+- **Controladores principales:**
+  - `app/Http/Controllers/DashboardController.php` - Dashboard principal
+  - `app/Http/Controllers/CalendarController.php` - Sistema de calendario
+  - `app/Http/Controllers/PostController.php` - Gestión de publicaciones
+  - `app/Http/Controllers/QueueController.php` - Gestión de cola de trabajos
+  - `app/Http/Controllers/OAuthController.php` - Integración con redes sociales
+  - `app/Http/Controllers/TwoFactorController.php` - Sistema 2FA
+- **Modelos principales:**
+  - `app/Models/PublishingSchedule.php` - Horarios de publicación
+  - `app/Models/ScheduledPost.php` - Publicaciones programadas
+  - `app/Models/SocialAccount.php` - Cuentas sociales conectadas
+- **Vistas principales:**
+  - `resources/views/calendar/` - Interfaz del calendario
+  - `resources/views/dashboard.blade.php` - Dashboard principal
+  - `resources/views/auth/` - Vistas de autenticación personalizadas
+  - `resources/views/layouts/` - Layouts y navegación
+- **Jobs y comandos:**
+  - `app/Jobs/PublishScheduledPost.php` - Publicación automática
+  - `app/Jobs/ProcessScheduledPublications.php` - Procesamiento de horarios
+  - `app/Console/Commands/ProcessScheduledPublications.php` - Comando de consola
+- **Assets:** 
+  - `resources/css/app.css` - Estilos principales
+  - `resources/js/app.js` - JavaScript principal
+
+## 9) Comandos útiles para desarrollo
+
+### Limpieza de cachés
 ```bash
 php artisan route:clear
 php artisan config:clear
 php artisan view:clear
 php artisan optimize:clear
 ```
-- Volver a migrar desde cero (¡destruye datos!):
+
+### Base de datos
 ```bash
+# Volver a migrar desde cero (¡destruye datos!)
 php artisan migrate:fresh --seed
+```
+
+### Monitoreo y debugging
+```bash
+# Ver logs en tiempo real (Windows PowerShell)
+Get-Content "storage\logs\laravel.log" -Wait -Tail 10
+
+# Ver logs en tiempo real (Linux/Mac)
+tail -f storage/logs/laravel.log
+
+# Procesar horarios manualmente
+php artisan schedule:process-publications
+
+# Verificar cola de trabajos
+php artisan queue:work --verbose
 ```
 
 ## 10) Solución de problemas
@@ -143,24 +193,32 @@ php artisan migrate:fresh --seed
 
 ## Estado actual y próximos pasos
 
-### Completado
-- ✅ Sistema base de autenticación
-- ✅ Integración con Twitter
-- ✅ Integración con Reddit
-- ✅ Sistema de programación de publicaciones
-- ✅ Procesamiento en segundo plano
-- ✅ Interfaz de usuario base
+### ✅ Completado
+- ✅ **Sistema de calendario avanzado** con FullCalendar.js
+  - Vista mensual, semanal y diaria con navegación fluida
+  - Scroll completo de 24 horas en vistas de tiempo
+  - Título dinámico que muestra mes/año/semana/día actual
+- ✅ **Horarios de publicación flexibles**
+  - Horarios específicos: fecha y hora exacta
+  - Horarios recurrentes: selección de días de la semana con rango de fechas opcional
+  - Validación avanzada para evitar conflictos de datos
+- ✅ **Autenticación de dos factores (2FA)**
+  - Protección para acciones sensibles (perfil, desconectar cuentas)
+  - Códigos TOTP compatibles con Google Authenticator
+  - Middleware de verificación automática
+- ✅ **Base de datos optimizada**
+  - Índices optimizados para consultas de calendario
+- ✅ **Interfaz de usuario mejorada**
+  - Formularios con validación en tiempo real
+  - Mensajes de éxito y error informativos
+  - Componentes responsivos con Tailwind CSS
 
-### En progreso
-- 🔄 Mejoras en la interfaz de usuario
-- 🔄 Optimización del sistema de colas
-- 🔄 Manejo de errores y reintentos
-
-### Pendiente
-- ⏳ Implementación de autenticación de dos factores (2FA)
-- ⏳ Conectar los enlaces de la navbar (Publicaciones, Cola, Horarios, Configuración) //Técnicamente ya están, sólo que no sé qué hacer con Horarios, tal vez cambiarlo a algo para ver las publicaciones hechas con datos como fecha, estado, Descripción etc.
-- ⏳ Implementar sistema de supervisor o similar para mantener los procesos de cola y scheduler ejecutándose en producción
-- ⏳ Mejorar el manejo de errores y reintentos en las publicaciones fallidas
+### ⏳ Pendiente
+- ⏳ Dashboard con estadísticas de publicaciones
+- ⏳ Historial detallado de publicaciones realizadas
+- ⏳ Sistema de notificaciones push
+- ⏳ Implementar sistema de supervisor para producción
+- ⏳ Exportación de reportes de actividad
 
 ## Servicios necesarios
 

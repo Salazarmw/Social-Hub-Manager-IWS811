@@ -22,10 +22,9 @@
                     <x-nav-link :href="route('queue.index')" :active="request()->routeIs('queue.index')">
                         {{ __('Cola') }}
                     </x-nav-link>
-                    <a href="#"
-                        class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition">
+                    <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')">
                         {{ __('Horarios') }}
-                    </a>
+                    </x-nav-link>
                     <x-nav-link :href="route('settings')" :active="request()->routeIs('settings')">
                         {{ __('Configuración') }}
                     </x-nav-link>
@@ -98,7 +97,7 @@
             <x-responsive-nav-link :href="route('queue.index')" :active="request()->routeIs('queue.index')">
                 {{ __('Cola') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="#">
+            <x-responsive-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.*')">
                 {{ __('Horarios') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('settings')" :active="request()->routeIs('settings')">
