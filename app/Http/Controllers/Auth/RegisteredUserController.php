@@ -41,10 +41,12 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'remember_token' => Str::random(60),
-            'two_factor_secret' => false,
+            'two_factor_enabled' => false,
         ]);
 
         event(new Registered($user));
+
+        Auth::login($user);
 
         return redirect()->route('verification.notice');
     }
