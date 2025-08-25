@@ -34,12 +34,12 @@ class CalendarScheduler {
     
     createModal() {
         const modalHTML = `
-            <div id="calendar-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-                <div class="bg-white rounded-lg shadow-xl p-4 w-full max-w-lg mx-4 transform transition-all">
+            <div id="calendar-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 z-50 flex items-center justify-center hidden">
+                <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg mx-4 transform transition-all">
                     <!-- Header -->
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-gray-900">Programar publicación</h3>
-                        <button id="close-calendar-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <button id="close-calendar-modal" class="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -94,11 +94,11 @@ class CalendarScheduler {
                     </div>
                     
                     <!-- Action buttons -->
-                    <div class="flex justify-end space-x-2 relative z-50">
-                        <button id="cancel-schedule" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button id="cancel-schedule" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                             Cancelar
                         </button>
-                        <button id="select-date-time" class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors">
+                        <button id="select-date-time" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                             Programar
                         </button>
                     </div>
@@ -234,14 +234,27 @@ class CalendarScheduler {
         cellDate.setHours(0, 0, 0, 0);
         
         if (cellDate < today) {
-            // Fecha pasada - deshabilitada
-            button.classList.add('text-gray-300', 'cursor-not-allowed');
+            // Fecha pasada - deshabilitada con estilo más visible
+            button.classList.add(
+                'text-gray-400', 
+                'bg-gray-100', 
+                'cursor-not-allowed',
+                'line-through',
+                'opacity-50'
+            );
             button.disabled = true;
+            button.title = 'Fecha no disponible';
         } else {
             // Fecha futura - seleccionable
             button.classList.add(
-                'text-gray-700', 'hover:bg-blue-100', 'hover:text-blue-600', 
-                'cursor-pointer', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500'
+                'text-gray-700', 
+                'hover:bg-blue-100', 
+                'hover:text-blue-600', 
+                'cursor-pointer', 
+                'focus:outline-none', 
+                'focus:ring-2', 
+                'focus:ring-blue-500',
+                'hover:shadow-sm'
             );
             
             button.dataset.year = this.currentYear;
@@ -272,14 +285,39 @@ class CalendarScheduler {
         this.clearSelection();
         
         // Seleccionar nueva fecha
-        button.classList.add('selected-date', 'bg-blue-600', 'text-white');
-        button.classList.remove('hover:bg-blue-100', 'hover:text-blue-600', 'text-gray-700', 'bg-blue-50', 'text-blue-600');
+        button.classList.add(
+            'selected-date', 
+            'bg-indigo-600', 
+            'text-white',
+            'ring-2',
+            'ring-indigo-600',
+            'ring-offset-2',
+            'font-medium',
+            'shadow-sm'
+        );
+        button.classList.remove(
+            'hover:bg-blue-100', 
+            'hover:text-blue-600', 
+            'text-gray-700', 
+            'bg-blue-50', 
+            'text-blue-600'
+        );
     }
     
     clearSelection() {
         const selected = this.calendarBody.querySelector('.selected-date');
         if (selected) {
-            selected.classList.remove('selected-date', 'bg-blue-600', 'text-white');
+            // Remover todas las clases de selección
+            selected.classList.remove(
+                'selected-date', 
+                'bg-indigo-600', 
+                'text-white',
+                'ring-2',
+                'ring-indigo-600',
+                'ring-offset-2',
+                'font-medium',
+                'shadow-sm'
+            );
             
             // Restaurar estilos originales
             const day = parseInt(selected.textContent);
@@ -289,7 +327,16 @@ class CalendarScheduler {
             today.setHours(0, 0, 0, 0);
             
             if (cellDate >= today) {
-                selected.classList.add('text-gray-700', 'hover:bg-blue-100', 'hover:text-blue-600');
+                selected.classList.add(
+                    'text-gray-700', 
+                    'hover:bg-blue-100', 
+                    'hover:text-blue-600',
+                    'cursor-pointer', 
+                    'focus:outline-none', 
+                    'focus:ring-2', 
+                    'focus:ring-blue-500',
+                    'hover:shadow-sm'
+                );
                 
                 // Si era el día de hoy, restaurar su estilo especial
                 if (this.isToday(cellDate, today)) {

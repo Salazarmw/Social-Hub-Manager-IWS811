@@ -105,8 +105,8 @@ class OAuthController extends Controller
     private function redirectX()
     {
         $connection = new \Abraham\TwitterOAuth\TwitterOAuth(
-            env('X_API_KEY'),
-            env('X_API_KEY_SECRET')
+            config('services.x.key'),
+            config('services.x.secret')
         );
 
         $request_token = $connection->oauth('oauth/request_token', [
@@ -133,8 +133,8 @@ class OAuthController extends Controller
         $request_token_secret = session('x_oauth_token_secret');
 
         $connection = new \Abraham\TwitterOAuth\TwitterOAuth(
-            env('X_API_KEY'),
-            env('X_API_KEY_SECRET'),
+            config('services.x.key'),
+            config('services.x.secret'),
             $request_token,
             $request_token_secret
         );
@@ -144,9 +144,12 @@ class OAuthController extends Controller
         ]);
 
         auth()->user()->socialAccounts()->updateOrCreate(
-            ['provider' => 'x'],
             [
-                'provider_user_id' => $access_token['user_id'],
+                'provider' => 'x',
+                'user_id' => auth()->id()
+            ],
+            [
+                'provider_user_id' => (string)$access_token['user_id'],
                 'token' => encrypt($access_token['oauth_token']),
                 'token_secret' => encrypt($access_token['oauth_token_secret']),
                 'nickname' => $access_token['screen_name'],
@@ -222,12 +225,12 @@ class OAuthController extends Controller
         session(['reddit_state' => $state]);
 
         $params = [
-            'client_id' => env('REDDIT_CLIENT_ID'),
+            'client_id' => config('services.reddit.client_id'),
             'response_type' => 'code',
             'state' => $state,
-            'redirect_uri' => route('oauth.callback', 'reddit'),
+            'redirect_uri' => config('services.reddit.redirect_uri'),
             'duration' => 'permanent',
-            'scope' => 'identity submit'
+            'scope' => 'identity edit submit read'
         ];
 
         $url = 'https://www.reddit.com/api/v1/authorize?' . http_build_query($params);
@@ -244,13 +247,13 @@ class OAuthController extends Controller
         }
 
         // Intercambiar código por token
-        $response = Http::withBasicAuth(env('REDDIT_CLIENT_ID'), env('REDDIT_CLIENT_SECRET'))
+        $response = Http::withBasicAuth(config('services.reddit.client_id'), config('services.reddit.client_secret'))
             ->asForm()
-            ->withHeaders(['User-Agent' => env('APP_NAME') . '/1.0'])
+            ->withHeaders(['User-Agent' => config('services.reddit.user_agent')])
             ->post('https://www.reddit.com/api/v1/access_token', [
                 'grant_type' => 'authorization_code',
                 'code' => $code,
-                'redirect_uri' => route('oauth.callback', 'reddit'),
+                'redirect_uri' => config('services.reddit.redirect_uri'),
             ]);
 
         if (!$response->successful()) {

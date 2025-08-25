@@ -1,6 +1,16 @@
-# Social Hub Manager — Guía de instalación local (Windows)
+# Social Hub Manager — Guía de instalación y documentación
 
-Esta guía explica cómo clonar, configurar y ejecutar el proyecto en un entorno local.
+Este proyecto es un gestor de redes sociales que permite programar y publicar contenido en múltiples plataformas sociales desde una única interfaz.
+
+## Características implementadas
+
+- ✅ Autenticación de usuarios
+- ✅ Integración con Twitter (X)
+- ✅ Integración con Reddit
+- ✅ Programación de publicaciones
+- ✅ Cola de publicaciones
+- ✅ Sistema de procesamiento en segundo plano
+- ✅ Interfaz moderna con Tailwind CSS
 
 ## Requisitos previos
 - PHP 8.2+
@@ -131,18 +141,36 @@ php artisan migrate:fresh --seed
 
 
 
-## 11) Qué falta
-- Conectar los enlaces de la navbar (Publicaciones, Cola, Horarios, Configuración) a rutas reales.
-- Implementar 2FA.
-- Implementar las diferentes redes y hacer que el proyecto sirva en general xD
+## Estado actual y próximos pasos
 
+### Completado
+- ✅ Sistema base de autenticación
+- ✅ Integración con Twitter
+- ✅ Integración con Reddit
+- ✅ Sistema de programación de publicaciones
+- ✅ Procesamiento en segundo plano
+- ✅ Interfaz de usuario base
 
-## 12) Para ejecutar los schedules
+### En progreso
+- 🔄 Mejoras en la interfaz de usuario
+- 🔄 Optimización del sistema de colas
+- 🔄 Manejo de errores y reintentos
 
-Para que las publicaciones programadas funcionen correctamente, necesitas ejecutar dos comandos: 
-- php artisan app:process-scheduled-posts
-- php artisan queue:work
+### Pendiente
+- ⏳ Implementación de autenticación de dos factores (2FA)
+- ⏳ Conectar los enlaces de la navbar (Publicaciones, Cola, Horarios, Configuración) //Técnicamente ya están, sólo que no sé qué hacer con Horarios, tal vez cambiarlo a algo para ver las publicaciones hechas con datos como fecha, estado, Descripción etc.
+- ⏳ Implementar sistema de supervisor o similar para mantener los procesos de cola y scheduler ejecutándose en producción
+- ⏳ Mejorar el manejo de errores y reintentos en las publicaciones fallidas
 
-Estos comandos deben ejecutarse en terminales separadas. El primero procesa las publicaciones programadas, y el segundo procesa la cola de publicaciones.
+## Servicios necesarios
 
-Hay que buscar una forma de que estén siempre ejecutandose cuando se aloje en un servidor
+Para que las publicaciones programadas funcionen correctamente, se requieren dos servicios ejecutándose:
+
+```bash
+# Terminal 1: Worker de la cola
+php artisan queue:work --daemon
+
+# Terminal 2: Scheduler
+php artisan schedule:work
+```
+
