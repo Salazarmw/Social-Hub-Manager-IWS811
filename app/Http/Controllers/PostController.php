@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ScheduledPost;
-use Illuminate\Http\Request;
+use App\Http\Requests\StorePostRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Jobs\PublishScheduledPost;
 
@@ -28,14 +28,8 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        $request->validate([
-            'content' => 'required|string|max:280',
-            'platforms' => 'required|array',
-            'platforms.*' => 'string|in:twitter,reddit',
-            'scheduled_date' => 'nullable|date_format:Y-m-d H:i:s',
-        ]);
 
         $scheduledDate = $request->input('scheduled_date');
 
@@ -52,14 +46,22 @@ class PostController extends Controller
         ]);
 
         // Si no hay fecha programada, despachar el job inmediatamente
-        if (!$scheduledDate) {
-            dispatch(new \App\Jobs\PublishScheduledPost($post));
-        }
+        try {
+            if (!$scheduledDate) {
+                dispatch(new \App\Jobs\PublishScheduledPost($post));
+                return redirect()->route('dashboard')
+                    ->with('success', '¡La publicación se ha enviado correctamente y se está procesando!');
+            }
 
-        return redirect()->route('dashboard')
-            ->with('success', $scheduledDate
-                ? 'Publicación programada correctamente para ' . date('d/m/Y H:i', strtotime($scheduledDate))
-                : 'Publicación creada correctamente');
+            return redirect()->route('dashboard')
+                ->with('success', sprintf(
+                    '¡Publicación programada correctamente para el %s!',
+                    date('d/m/Y \a \l\a\s H:i', strtotime($scheduledDate))
+                ));
+        } catch (\Exception $e) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Ha ocurrido un error al procesar la publicación. Por favor, inténtalo de nuevo.');
+        }
     }
 
     /**
