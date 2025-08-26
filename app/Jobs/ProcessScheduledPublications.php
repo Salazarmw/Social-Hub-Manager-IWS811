@@ -72,23 +72,35 @@ class ProcessScheduledPublications implements ShouldQueue
             return;
         }
 
+        // Crear la fecha programada para hoy a la hora especificada
         $scheduledDateTime = $now->copy()
-            ->setTimeFromTimeString($schedule->recurring_time->format('H:i:s'))
-            ->addMinutes(5);
+            ->setTimeFromTimeString($schedule->recurring_time->format('H:i:s'));
 
-        ScheduledPost::create([
-            'user_id' => $schedule->user_id,
-            'content' => $schedule->content,
-            'platforms' => $schedule->platforms,
-            'scheduled_date' => $scheduledDateTime,
-            'status' => 'pending',
-        ]);
+        // Si ya pasó la hora de hoy, programar para mañana
+        if ($now->gt($scheduledDateTime)) {
+            $scheduledDateTime->addDay();
+        }
 
-        Log::info('Publicación recurrente creada', [
-            'schedule_id' => $schedule->id,
-            'scheduled_for' => $scheduledDateTime,
-            'user_id' => $schedule->user_id
-        ]);
+        // Verificar si ya existe una publicación programada para esta fecha/hora
+        $existingPost = ScheduledPost::where('user_id', $schedule->user_id)
+            ->whereDate('scheduled_date', $scheduledDateTime->toDateString())
+            ->whereTime('scheduled_date', $scheduledDateTime->format('H:i:s'))
+            ->first();
+
+        if (!$existingPost) {
+            ScheduledPost::create([
+                'user_id' => $schedule->user_id,
+                'content' => $schedule->content,
+                'platforms' => $schedule->platforms,
+                'scheduled_date' => $scheduledDateTime,
+                'status' => 'pending',
+            ]);
+
+            Log::info('Publicación recurrente creada', [
+                'schedule_id' => $schedule->id,
+                'scheduled_for' => $scheduledDateTime,
+                'user_id' => $schedule->user_id
+            ]);
     }
 
     /**
@@ -96,33 +108,37 @@ class ProcessScheduledPublications implements ShouldQueue
      */
     private function processSpecificSchedule(PublishingSchedule $schedule, Carbon $now)
     {
-        // Verificar si es hora de crear la publicación (30 minutos antes)
+        // Obtener la fecha y hora programada
         $scheduleDateTime = $schedule->schedule_date->copy()
             ->setTimeFromTimeString($schedule->schedule_time->format('H:i:s'));
 
-        $thirtyMinutesBefore = $scheduleDateTime->copy()->subMinutes(30);
-
-        if ($now->lt($thirtyMinutesBefore) || $now->gt($scheduleDateTime)) {
-            if ($now->gt($scheduleDateTime)) {
-                $schedule->update(['status' => 'completed']);
-            }
+        // Si la fecha ya pasó, marcar como completado
+        if ($now->gt($scheduleDateTime)) {
+            $schedule->update(['status' => 'completed']);
             return;
         }
 
-        ScheduledPost::create([
-            'user_id' => $schedule->user_id,
-            'content' => $schedule->content,
-            'platforms' => $schedule->platforms,
-            'scheduled_date' => $scheduleDateTime,
-            'status' => 'pending',
-        ]);
+        // Verificar si ya existe una publicación programada
+        $existingPost = ScheduledPost::where('user_id', $schedule->user_id)
+            ->whereDate('scheduled_date', $scheduleDateTime->toDateString())
+            ->whereTime('scheduled_date', $scheduleDateTime->format('H:i:s'))
+            ->first();
 
-        $schedule->update(['status' => 'completed']);
+        if (!$existingPost) {
+            ScheduledPost::create([
+                'user_id' => $schedule->user_id,
+                'content' => $schedule->content,
+                'platforms' => $schedule->platforms,
+                'scheduled_date' => $scheduleDateTime,
+                'status' => 'pending',
+            ]);
 
-        Log::info('Publicación específica creada', [
-            'schedule_id' => $schedule->id,
-            'scheduled_for' => $scheduleDateTime,
-            'user_id' => $schedule->user_id
-        ]);
+            $schedule->update(['status' => 'completed']);
+
+            Log::info('Publicación específica creada', [
+                'schedule_id' => $schedule->id,
+                'scheduled_for' => $scheduleDateTime,
+                'user_id' => $schedule->user_id
+            ]);
     }
 }
