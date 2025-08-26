@@ -92,7 +92,8 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <form method="POST" action="{{ route('oauth.revoke', $provider) }}" class="inline">
+                                    <form method="POST" action="{{ route('oauth.revoke', $provider) }}" class="inline"
+                                        data-requires2fa="true">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
@@ -119,59 +120,12 @@
                 </div>
             </section>
 
-            <!-- Platform Status -->
-            <section>
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Estado de Plataformas</h3>
-                <div class="bg-white border border-gray-100 rounded-xl p-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        @foreach ($availableProviders as $providerKey => $providerName)
-                            @php
-                                $isConnected = $accounts->has($providerKey);
-                                $hasConfig = match ($providerKey) {
-                                    'x' => config('services.x.api_key') && config('services.x.api_secret'),
-                                    'google' => config('services.google.client_id') &&
-                                        config('services.google.client_secret'),
-                                    'github' => config('services.github.client_id') &&
-                                        config('services.github.client_secret'),
-                                    'discord' => config('services.discord.client_id') &&
-                                        config('services.discord.client_secret'),
-                                    'reddit' => config('services.reddit.client_id') &&
-                                        config('services.reddit.client_secret'),
-                                    'telegram' => config('services.telegram.bot_token') &&
-                                        config('services.telegram.bot_username'),
-                                    default => false,
-                                };
-                            @endphp
-
-                            <div
-                                class="flex items-center space-x-3 p-3 {{ $hasConfig ? 'bg-green-50' : 'bg-red-50' }} rounded-lg">
-                                <div
-                                    class="w-3 h-3 rounded-full {{ $isConnected ? 'bg-green-500' : ($hasConfig ? 'bg-yellow-500' : 'bg-red-500') }}">
-                                </div>
-                                <div>
-                                    <div class="font-medium text-gray-900">{{ $providerName }}</div>
-                                    <div class="text-sm text-gray-500">
-                                        @if ($isConnected)
-                                            Conectado
-                                        @elseif($hasConfig)
-                                            Configurado, no conectado
-                                        @else
-                                            No configurado
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </section>
-
             <!-- 2FA -->
             <section x-data="{ showModal: false }">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Seguridad – Autenticación en dos pasos</h3>
                 <div class="bg-white border border-gray-100 rounded-xl p-6">
                     @if ($twoFactorEnabled)
-                        <form method="POST" action="{{ route('2fa.disable') }}">
+                        <form method="POST" action="{{ route('2fa.disable') }}" data-requires2fa="true">
                             @csrf
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-700">2FA está <span
@@ -191,16 +145,23 @@
                                 Activar 2FA
                             </button>
                         </div>
+
                         <!-- Modal QR -->
-                        <template x-if="showModal">
-                            <x-modal>
-                                <h4 class="text-lg font-semibold mb-4">Activar 2FA</h4>
-                                <p class="text-sm text-gray-600 mb-2">Escanea el siguiente código con tu app de
+                        <div x-show="showModal" x-transition.opacity
+                            class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50"
+                            @click.self="showModal = false" style="display: none;">
+                            <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-lg font-semibold">Activar 2FA</h4>
+                                    <button @click="showModal = false"
+                                        class="text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-4">Escanea el siguiente código con tu app de
                                     autenticación:</p>
-                                <div class="border p-2 bg-white mb-4 flex justify-center">{!! $qrCode !!}</div>
+                                <div class="border p-4 bg-white mb-4 flex justify-center">{!! $qrCode !!}</div>
                                 <x-two-factor-form />
-                            </x-modal>
-                        </template>
+                            </div>
+                        </div>
                     @endif
                 </div>
             </section>
