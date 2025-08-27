@@ -11,8 +11,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            '2fa.verified' => \App\Http\Middleware\Ensure2FAIsVerified::class,
+            '2fa.sensitive' => \App\Http\Middleware\TwoFactorSensitiveAction::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->withSchedule(function (Illuminate\Console\Scheduling\Schedule $schedule) {
+        $schedule->command('app:process-scheduled-posts')->everyMinute();
+    })
+    ->create();

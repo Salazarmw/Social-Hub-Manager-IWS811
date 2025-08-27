@@ -35,4 +35,47 @@ return [
         ],
     ],
 
+    // Google OAuth (Socialite compatible)
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL') . '/oauth/google/callback'),
+    ],
+
+    // GitHub OAuth (Socialite compatible)
+    'github' => [
+        'client_id' => env('GITHUB_CLIENT_ID'),
+        'client_secret' => env('GITHUB_CLIENT_SECRET'),
+        'redirect' => env('GITHUB_REDIRECT_URI', env('APP_URL') . '/oauth/github/callback'),
+    ],
+
+    // X (Twitter) OAuth 1.0a - Manual implementation
+    'x' => [
+        'key' => env('X_API_KEY'),
+        'secret' => env('X_API_KEY_SECRET'),
+        'token' => env('X_TOKEN'),
+        'token_secret' => env('X_TOKEN_SECRET'),
+        'redirect_uri' => env('X_REDIRECT_URI', env('APP_URL') . '/oauth/x/callback'),
+    ],
+
+    // Discord OAuth 2.0 - Manual implementation
+    'discord' => [
+        'client_id' => env('DISCORD_CLIENT_ID'),
+        'client_secret' => env('DISCORD_CLIENT_SECRET'),
+        'redirect_uri' => env('DISCORD_REDIRECT_URI', env('APP_URL') . '/oauth/discord/callback'),
+    ],
+
+    // Reddit OAuth 2.0 - Manual implementation
+    'reddit' => [
+        'client_id' => env('REDDIT_CLIENT_ID'),
+        'client_secret' => env('REDDIT_CLIENT_SECRET'),
+        'redirect_uri' => env('REDDIT_REDIRECT_URI', env('APP_URL') . '/oauth/reddit/callback'),
+        'user_agent' => env('REDDIT_USER_AGENT', 'web:social-hub-manager:v1.0 (by /u/your_reddit_username)'),
+    ],
+
+    // Telegram Bot Widget - Manual implementation
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'bot_username' => env('TELEGRAM_BOT_USERNAME'),
+    ],
 ];
