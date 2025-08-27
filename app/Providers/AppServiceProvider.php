@@ -24,3 +24,4 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
         }
     }
+}
