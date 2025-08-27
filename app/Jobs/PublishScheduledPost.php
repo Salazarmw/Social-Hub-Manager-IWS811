@@ -40,9 +40,12 @@ class PublishScheduledPost implements ShouldQueue
             $publishedSuccessfully = true;
             foreach ($this->post->platforms as $platform) {
                 try {
-                    switch ($platform) {
+                    // Normalizar el nombre de la plataforma
+                    $normalizedPlatform = $platform === 'x' ? 'twitter' : $platform;
+
+                    switch ($normalizedPlatform) {
                         case 'twitter':
-                            // Obtener la cuenta social de Twitter del usuario
+                            // Obtener la cuenta social de Twitter/X del usuario
                             $twitterAccount = $this->post->user->socialAccounts()
                                 ->where('provider', 'x')
                                 ->first();

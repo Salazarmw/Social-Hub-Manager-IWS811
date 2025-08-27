@@ -65,9 +65,10 @@ class CalendarController extends Controller
 
         $events = [];
 
-        // Obtener horarios programados
+        // Obtener solo los horarios programados que no son automáticos
         $schedules = PublishingSchedule::where('user_id', Auth::id())
             ->active()
+            ->where('status', '!=', 'completed')
             ->get();
 
         // Procesar cada horario para generar eventos en el período solicitado
@@ -133,30 +134,7 @@ class CalendarController extends Controller
             }
         }
 
-        $scheduledPosts = ScheduledPost::where('user_id', Auth::id())
-            ->whereBetween('scheduled_date', [$start, $end])
-            ->whereIn('status', ['pending', 'processing'])
-            ->get();
-
-        foreach ($scheduledPosts as $post) {
-            $events[] = [
-                'id' => 'post_' . $post->id,
-                'title' => '📝 ' . Str::limit($post->content, 30),
-                'start' => $post->scheduled_date->format('Y-m-d\TH:i:s'),
-                'type' => 'scheduled_post',
-                'post_id' => $post->id,
-                'className' => 'scheduled-post-event',
-                'backgroundColor' => '#F59E0B',
-                'borderColor' => '#D97706',
-                'extendedProps' => [
-                    'content' => $post->content,
-                    'status' => $post->status,
-                    'platforms' => $post->platforms,
-                    'type' => 'scheduled_post',
-                    'post_id' => $post->id
-                ]
-            ];
-        }
+        // Ya no mostraremos los ScheduledPosts en el calendario
 
         return response()->json($events);
     }
@@ -231,7 +209,7 @@ class CalendarController extends Controller
         ]);
 
         try {
-            PublishingSchedule::create([
+            $schedule = PublishingSchedule::create([
                 'user_id' => Auth::id(),
                 'title' => $request->title,
                 'content' => $request->content,
@@ -245,6 +223,30 @@ class CalendarController extends Controller
                 'recurring_end_date' => $request->recurring_end_date,
                 'notes' => $request->notes,
             ]);
+
+            // Si no es recurrente, crear inmediatamente el ScheduledPost
+            if (!$request->boolean('is_recurring')) {
+                $scheduleDateTime = Carbon::parse($request->schedule_date)
+                    ->setTimeFromTimeString($request->schedule_time);
+
+                // Convertir 'x' a 'twitter' en las plataformas
+                $platforms = array_map(function($platform) {
+                    return $platform === 'x' ? 'twitter' : $platform;
+                }, $request->platforms);
+
+                ScheduledPost::create([
+                    'user_id' => Auth::id(),
+                    'content' => $request->content,
+                    'platforms' => $platforms,
+                    'scheduled_date' => $scheduleDateTime,
+                    'status' => 'pending',
+                ]);
+
+                Log::info('Post programado creado inmediatamente', [
+                    'schedule_id' => $schedule->id,
+                    'scheduled_for' => $scheduleDateTime
+                ]);
+            }
 
             Log::info('Horario creado exitosamente');
         } catch (\Exception $e) {

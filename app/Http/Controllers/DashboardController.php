@@ -29,6 +29,29 @@ class DashboardController extends Controller
             'accounts' => SocialAccount::where('user_id', Auth::id())->count()
         ];
 
-        return view('dashboard', compact('stats'));
+        $socialAccounts = SocialAccount::where('user_id', Auth::id())->get()
+            ->map(function ($account) {
+                $hasValidToken = false;
+                $errorMessage = null;
+
+                try {
+                    if ($account->expires_in && now()->isAfter($account->expires_in)) {
+                        $errorMessage = 'Token expirado';
+                    } else {
+                        $hasValidToken = true;
+                    }
+                } catch (\Exception $e) {
+                    $errorMessage = 'Error de autenticación';
+                }
+
+                return [
+                    'provider' => $account->provider,
+                    'nickname' => $account->nickname,
+                    'hasValidToken' => $hasValidToken,
+                    'errorMessage' => $errorMessage
+                ];
+            });
+
+        return view('dashboard', compact('stats', 'socialAccounts'));
     }
 }

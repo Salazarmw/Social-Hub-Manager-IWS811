@@ -1,36 +1,98 @@
 <div id="platform-selector-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-show="showPlatformModal">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="relative top-20 mx-auto p-5 border w-[28rem] shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Seleccionar plataformas</h3>
             <div class="mt-4 space-y-3">
-                <label class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-50 cursor-pointer">
-                    <input type="checkbox" name="platforms[]" value="twitter" class="h-5 w-5 text-blue-600 rounded">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                            <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"></path>
-                            </svg>
+                @php
+                    $socialAccounts = $socialAccounts ?? collect([]);
+                    $twitterAccount = $socialAccounts->firstWhere('provider', 'x');
+                    $redditAccount = $socialAccounts->firstWhere('provider', 'reddit');
+                @endphp
+
+                <div class="rounded-lg hover:bg-blue-50 group">
+                    <div class="p-3">
+                        <div class="flex items-center mb-2">
+                            <input type="checkbox" name="platforms[]" value="twitter" class="h-5 w-5 text-blue-600 rounded"
+                                {{ !$twitterAccount || !$twitterAccount['hasValidToken'] ? 'disabled' : '' }}>
+                            <div class="ml-3 flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <img src="{{ asset('images/x.svg') }}" alt="X logo" class="w-5 h-5">
+                                </div>
+                                <span class="text-gray-700 font-medium">Twitter</span>
+                            </div>
                         </div>
-                        <span class="text-gray-700 font-medium">Twitter</span>
+                        
+                        @if (!$twitterAccount || !$twitterAccount['hasValidToken'])
+                            <div class="ml-8 flex items-center justify-between">
+                                <div class="flex-grow">
+                                    @if (!$twitterAccount)
+                                        <span class="text-sm text-gray-500">No conectado</span>
+                                    @elseif (!$twitterAccount['hasValidToken'])
+                                        <span class="text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                            </svg>
+                                            {{ $twitterAccount['errorMessage'] }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <a href="{{ route('settings') }}" class="ml-4 px-3 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow-sm transition-colors">
+                                    Configurar
+                                </a>
+                            </div>
+                        @endif
                     </div>
-                </label>
-                <label class="flex items-center space-x-3 p-3 rounded-lg hover:bg-orange-50 cursor-pointer">
-                    <input type="checkbox" name="platforms[]" value="reddit" class="h-5 w-5 text-orange-600 rounded">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                            <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.957 0 1.734.746 1.734 1.666 0 .513-.256.964-.642 1.242.013.109.02.219.02.331 0 3.659-4.476 6.624-10.002 6.624-5.525 0-10-2.966-10-6.624 0-.112.007-.222.02-.331a1.61 1.61 0 0 1-.642-1.242c0-.92.777-1.666 1.734-1.666.478 0 .9.182 1.207.491 1.185-.851 2.826-1.41 4.636-1.488l.913-4.179a.84.84 0 0 1 .987-.654l2.898.615a1.2 1.2 0 0 1 1.137-.836z"></path>
-                            </svg>
+                </div>
+
+                <label class="flex items-center p-3 rounded-lg hover:bg-orange-50 cursor-pointer group relative">
+                    <input type="checkbox" name="platforms[]" value="reddit" class="h-5 w-5 text-orange-600 rounded"
+                        {{ !$redditAccount || !$redditAccount['hasValidToken'] ? 'disabled' : '' }}>
+                    <div class="ml-3 flex-grow flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                <img src="{{ asset('images/reddit.svg') }}" alt="Reddit logo" class="w-5 h-5">
+                            </div>
+                            <span class="text-gray-700 font-medium">Reddit</span>
                         </div>
-                        <span class="text-gray-700 font-medium">Reddit</span>
+                        @if (!$redditAccount)
+                            <span class="text-sm text-gray-500">No conectado</span>
+                        @elseif (!$redditAccount['hasValidToken'])
+                            <span class="text-sm text-red-600 flex items-center">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                                {{ $redditAccount['errorMessage'] }}
+                            </span>
+                        @endif
                     </div>
+                    @if (!$redditAccount || !$redditAccount['hasValidToken'])
+                        <a href="{{ route('settings') }}" class="hidden group-hover:block absolute right-3 px-2 py-1 text-xs bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200">
+                            Configurar
+                        </a>
+                    @endif
                 </label>
             </div>
+
+            @if(!$socialAccounts->where('hasValidToken', true)->count())
+                <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                    <p class="text-sm text-amber-700 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        No hay plataformas disponibles para publicar. Por favor, conecta y verifica tus cuentas en
+                        <a href="{{ route('settings') }}" class="ml-1 font-medium underline hover:text-amber-800">Configuración</a>.
+                    </p>
+                </div>
+            @endif
+
             <div class="mt-5 flex justify-end space-x-3">
                 <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md" onclick="closePlatformModal()">
                     Cancelar
                 </button>
-                <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md" onclick="applyPlatformSelection()">
+                <button type="button" 
+                    class="px-4 py-2 text-sm font-medium text-white rounded-md {{ $socialAccounts->where('hasValidToken', true)->count() ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-400 cursor-not-allowed' }}"
+                    onclick="applyPlatformSelection()"
+                    {{ !$socialAccounts->where('hasValidToken', true)->count() ? 'disabled' : '' }}>
                     Aplicar
                 </button>
             </div>
